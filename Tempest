@@ -1,0 +1,125 @@
+TryHackMe: Tempest – Incident Response Capstone
+
+A complete hands-on incident response simulation based on the [TryHackMe Tempest Incident Response Capstone](https://tryhackme.com/room/tempestincident). This challenge mimics a realistic enterprise compromise. Below is a structured breakdown of my experience, the challenges faced, and how I solved them.
+
+
+Task Mapping
+
+| Task | Phase                               | Description                                             |
+| ---- | ----------------------------------- | ------------------------------------------------------- |
+| 1    | Introduction                        | Overview of a suspicious incident                       |
+| 2    | Preparation – Log Analysis          | Identifying relevant log data                           |
+| 3    | Preparation – Tools and Artifacts   | Selecting and mapping tools to IR steps                 |
+| 4    | Initial Access – Malicious Document | Analyzing embedded macros in documents                  |
+| 5    | Stage 2 Execution                   | Decoding PowerShell-based second-stage payloads         |
+| 6    | Document Traffic                    | Tracking traffic to attacker infrastructure             |
+| 7    | Internal Reconnaissance             | Detecting lateral movement within the network           |
+| 8    | Privilege Escalation                | Discovering SYSTEM access via token impersonation       |
+| 9    | Fully-Owned Machine                 | Tracing data exfiltration and final attacker objectives |
+
+
+Executive Summary
+
+This room challenged me to follow an attacker’s full kill chain from initial access to exfiltration. Tasks were designed to simulate real SOC investigations including:
+
+Malware analysis
+Endpoint and network log triage
+Lateral movement tracing
+Privilege escalation detection
+Command & Control (C2) analysis
+
+Detailed Breakdown by Task
+
+Task 1: Introduction
+
+Overview: Briefed on a suspicious internal and external incident.
+Goal: Understand the attacker’s campaign structure and prepare for IR steps.
+
+\Task 2: Log Analysis
+
+Tools: Syslog, EVTX logs, Zeek
+Key Events: Login failures, lateral movement markers, Event IDs 4624, 4688
+
+Task 3: Tool Mapping
+
+Network: Wireshark, Zeek
+Log Review: EventLog Explorer, Notepad++
+Malware: CyberChef, strings, Any.Run
+
+Task 4: Malicious Document
+
+Tool Used: olevba from oletools
+Finding: Embedded VBA macro downloading a dropper
+
+Task 5: Stage 2 Execution
+
+Activity: PowerShell backdoor captured in outbound traffic
+Decoded With: CyberChef
+
+Task 6: Malicious Traffic
+
+Indicators: DNS requests, base64 GET parameters
+Pattern: Periodic beaconing to `resolvecyber.xyz`
+
+Task 7: Internal Recon
+
+PowerShell Cmdlets: `net view`, `Get-ADUser`, `ping`
+Log Source: Event ID 4104
+
+Task 8: Privilege Escalation
+
+Method: Token impersonation
+Detection: Event ID 4672 + `whoami /groups`
+Mitigation: Enable LSA Protection
+
+Task 9: Actions on Objectives
+
+Exfil Method: FTP + HTTP POST
+Evidence: Base64-encoded archives
+
+
+C2 Encoding Example
+
+Observed Traffic:  GET /9ab626b5?q=dh2nVHlpICtgGd0VtcGVzdFxiZw5pbWFydGQK
+
+
+Decoded:  echo 'dh2nVHlpICtgGd0VtcGVzdFxiZw5pbWFydGQK' | base64 -d
+
+Output: `v...TestFiz...ward`
+
+Mapped MITRE Technique : [T1132.001 – Standard Encoding](https://attack.mitre.org/techniques/T1132/001/)
+
+
+IOC Summary
+
+| Type       | Value                  |
+| ---------- | ---------------------- |
+| IP Address | 185.62.188.45          |
+| Domain     | resolvecyber.xyz       |
+| Host       | phishteam.xyz          |
+| URI        | `/02dcf07/finaL.exe`   |
+| Event IDs  | 4104, 4624, 4688, 4672 |
+
+
+Tools & Techniques
+
+Logs: Event Viewer, EventLog Explorer, SysmonView, EvtxECmd
+Network: Wireshark, Zeek, Brim, tcpdump
+Malware: olevba, CyberChef, strings
+Analysis: AbuseIPDB, VirusTotal, Any.Run, IPinfo
+Doc: Markdown, ATT&CK Navigator, Typora
+
+
+
+Conclusion
+
+This project simulated an enterprise-scale compromise. It improved my:
+
+Triage of endpoint and network logs
+Skill decoding and analyzing real C2 payloads
+Understanding of attacker tactics
+Readiness for Tier 1/2 SOC and Incident Response roles
+
+
+
+Official Room : [TryHackMe - Tempest Incident Response Capstone](https://tryhackme.com/room/tempestincident)
